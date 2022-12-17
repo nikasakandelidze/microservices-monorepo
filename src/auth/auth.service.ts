@@ -46,7 +46,7 @@ export class AuthService {
         if (expired || iss) {
           throw new AuthenticationException(`Specified authorization token invalid`);
         }
-        return { verified: true, id: decodedData.context.id, name: decodedData.context.name, iss: decodedData.iss, sub: decodedData.sub, iat: decodedData.iat, exp: decodedData.exp };
+        return { verified: true, id: decodedData.context.id, email: decodedData.context.email, iss: decodedData.iss, sub: decodedData.sub, iat: decodedData.iat, exp: decodedData.exp };
       }
     } catch (e: any) {
       Logger.warn(e);
@@ -57,7 +57,7 @@ export class AuthService {
   private generateJwtTokenForUser(user: User): string {
     const now = this.currenUnixTimestampInSeconds();
     const expirationUnixSeconds = now + TWVENTY_MINUTES_EXPIRATION_IN_SECONDS;
-    const token = sign({ context: { id: user.id, name: user.name }, iss: ISSUER, sub: user.name, iat: now, exp: expirationUnixSeconds }, SECRET_KEY);
+    const token = sign({ context: { id: user.id, email: user.email }, iss: ISSUER, sub: user.email, iat: now, exp: expirationUnixSeconds }, SECRET_KEY);
     return token;
   }
 

@@ -14,7 +14,7 @@ export class VerifyToken {
 export class TokenVerificationResult {
   verified: boolean;
   id: string;
-  name: string;
+  email: string;
   iss: string;
   sub: string;
   iat: number;
