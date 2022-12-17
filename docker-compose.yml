@@ -1,0 +1,21 @@
+version: "3"
+services:
+  consul-server:
+    image: consul
+    command: "agent -server -bootstrap"
+  consul-agent1:
+    image: consul
+    ports:
+      - "8500:8500"
+    command: "agent -join consul-server -client 0.0.0.0 -ui"
+    links:
+      - consul-server
+    depends_on:
+      - consul-server
+  consul-agent2:
+    image: consul
+    command: "agent -join consul-server -client 0.0.0.0"
+    links:
+      - consul-server
+    depends_on:
+      - consul-server
