@@ -4,12 +4,6 @@ export class AddUser {
   password: string;
 }
 
-export class GetUser {
-  id: string;
-  name: string;
-  email: string;
-}
-
 export class PatchUser {
   name: string | undefined;
   email: string | undefined;

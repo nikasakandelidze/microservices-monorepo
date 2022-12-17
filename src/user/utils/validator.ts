@@ -1,5 +1,5 @@
-import { User } from './domain';
-import { AddUser, PutUser } from '../web/dto';
+import { User } from '../entity';
+import { AddUser, PutUser } from '../dto';
 
 export type ValidationResult = {
   message: string;
@@ -20,6 +20,9 @@ export const validateAddUser = (addUser: AddUser, users: Record<string, User>): 
     validationResult.valid = false;
   } else if (!addUser.email) {
     validationResult.message = `User email must not be empty`;
+    validationResult.valid = false;
+  } else if (!addUser.password) {
+    validationResult.message = `User password must not be empty`;
     validationResult.valid = false;
   }
   return validationResult;

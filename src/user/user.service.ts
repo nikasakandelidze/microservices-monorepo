@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { User } from './domain/domain';
-import { AddUser, GetUser, PatchUser, PutUser } from './web/dto';
+import { User } from './entity';
+import { AddUser, PatchUser, PutUser } from './dto';
 import { v4 as uuidv4 } from 'uuid';
-import { validateAddUser, validatePutUser } from './domain/validator';
+import { validateAddUser, validatePutUser } from './utils/validator';
 import { NotFoundException, ValidationException } from './utils/exceptions';
 import { Logger } from '@nestjs/common';
+import { Md5 } from 'ts-md5';
 
 @Injectable()
 export class UserService {
@@ -14,11 +15,15 @@ export class UserService {
     const { valid, message } = validateAddUser(addUser, this.users);
     if (valid) {
       const newId: string = uuidv4();
+      const now = new Date().toISOString();
+      const hashedPassword = new Md5().appendAsciiStr(addUser.password).end(false) as string;
       this.users[newId] = {
         id: newId,
         name: addUser.name,
         email: addUser.email,
-        password: addUser.password,
+        passwordHash: hashedPassword,
+        createdTimestamp: now,
+        updatedTimestamp: now,
       };
       return this.users[newId];
     } else {
@@ -27,22 +32,22 @@ export class UserService {
     }
   }
 
-  public getAllUsers(): Array<GetUser> {
+  public findUserWithEmail(email: string): User | undefined {
     return Object.keys(this.users)
       .map((id) => this.users[id])
-      .map((user) => ({ id: user.id, name: user.name, email: user.email }));
+      .find((user) => user.email === email);
   }
 
-  public getUserById(id: string): GetUser {
+  public getUserById(id: string): User {
     const user: User | undefined = this.users[id];
     if (user) {
-      return { id: user.id, name: user.name, email: user.email };
+      return user;
     } else {
       throw new NotFoundException(`User with id: ${id} not found`);
     }
   }
 
-  public patchUserWithId(id: string, patch: PatchUser): GetUser {
+  public patchUserWithId(id: string, patch: PatchUser): User {
     const user: User | undefined = this.users[id];
     if (user) {
       const patchObjectWithOnlyDefinedKeys = Object.keys(patch)
@@ -56,20 +61,20 @@ export class UserService {
           };
         }, {});
       this.users[id] = { ...user, ...patchObjectWithOnlyDefinedKeys };
-      return { id: user.id, name: user.name, email: user.email };
+      return this.users[id];
     } else {
       throw new NotFoundException(`User with id: ${id} not found`);
     }
   }
 
-  public putUserWithId(id: string, putUser: PutUser): GetUser {
+  public putUserWithId(id: string, putUser: PutUser): User {
     const user: User | undefined = this.users[id];
     if (user) {
       const validationResult = validatePutUser(putUser);
       if (validationResult.valid) {
         user.email = putUser.email;
         user.name = putUser.name;
-        return { id: user.id, name: user.name, email: user.email };
+        return user;
       } else {
         throw new ValidationException(validationResult.message);
       }
