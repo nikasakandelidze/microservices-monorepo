@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { User } from './domain';
-import { AddUser, GetUser, PatchUser, PutUser } from '../web/dto';
+import { User } from './domain/domain';
+import { AddUser, GetUser, PatchUser, PutUser } from './web/dto';
 import { v4 as uuidv4 } from 'uuid';
-import { validateAddUser, validatePutUser } from './validator';
-import { NotFoundException, ValidationException } from '../utils/exceptions';
+import { validateAddUser, validatePutUser } from './domain/validator';
+import { NotFoundException, ValidationException } from './utils/exceptions';
 import { Logger } from '@nestjs/common';
 
 @Injectable()
