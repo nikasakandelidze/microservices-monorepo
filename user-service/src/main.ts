@@ -3,8 +3,8 @@ import { AppModule } from './app.module';
 import { INestApplication, Logger } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
+// This was needed for consul library specifically since it wasn't working with "import" statement
 declare function require(name: string);
-
 const consul = require('consul');
 
 const PORT = process.env.PORT || 3003;
