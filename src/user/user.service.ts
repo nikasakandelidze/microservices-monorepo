@@ -22,9 +22,7 @@ export class UserService {
       };
       return this.users[newId];
     } else {
-      Logger.log(
-        `Validation for add user with email: ${addUser.email} failed. Message: ${message}`,
-      );
+      Logger.log(`Validation for add user with email: ${addUser.email} failed. Message: ${message}`);
       throw new ValidationException(message);
     }
   }

@@ -6,17 +6,12 @@ export type ValidationResult = {
   valid: boolean;
 };
 
-export const validateAddUser = (
-  addUser: AddUser,
-  users: Record<string, User>,
-): ValidationResult => {
+export const validateAddUser = (addUser: AddUser, users: Record<string, User>): ValidationResult => {
   const validationResult: ValidationResult = {
     message: undefined,
     valid: true,
   };
-  const sameEmailUser: string | undefined = Object.keys(users).find(
-    (id) => users[id].email === addUser.email,
-  );
+  const sameEmailUser: string | undefined = Object.keys(users).find((id) => users[id].email === addUser.email);
   if (sameEmailUser) {
     validationResult.message = `User with email: ${addUser.email} is already present`;
     validationResult.valid = false;
