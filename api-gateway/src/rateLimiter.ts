@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { createClient } from 'redis';
-import moment from 'moment';
+import * as moment from 'moment';
 
 export type RateLimitInput = {
   id: string;
@@ -23,6 +23,16 @@ export class RateLimiter {
 
   constructor() {
     this.redisClient = createClient();
+  }
+
+  async init() {
+    this.redisClient.on('error', (err) =>
+      Logger.log('Rate limiter cache error', err),
+    );
+    this.redisClient.on('connect', () =>
+      Logger.log('Rate limiter cache connected'),
+    );
+    await this.redisClient.connect();
   }
 
   public async throttleRequest(
