@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
-import { AuthResponse, LoginUser, TokenVerificationResult, VerifyToken } from './dto';
+import { AuthResponse, LoginUser, TokenVerificationResult, VerifyToken } from './dto/auth.dto';
 import { sign, verify, JwtPayload } from 'jsonwebtoken';
 import { Md5 } from 'ts-md5';
 import { AuthenticationException, NotFoundException, ValidationException } from 'src/user/exception';
