@@ -3,7 +3,7 @@ import { User } from './entity';
 import { AddUser, PatchUser, PutUser } from './dto';
 import { v4 as uuidv4 } from 'uuid';
 import { validateAddUser, validatePutUser } from './utils/validator';
-import { NotFoundException, ValidationException } from './utils/exceptions';
+import { NotFoundException, ValidationException } from './utils/exception';
 import { Logger } from '@nestjs/common';
 import { Md5 } from 'ts-md5';
 

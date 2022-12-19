@@ -5,7 +5,7 @@ import { AuthResponse, LoginUser, TokenVerificationResult, VerifyToken } from '.
 import { User } from 'src/user/entity';
 import { sign, verify, JwtPayload } from 'jsonwebtoken';
 import { Md5 } from 'ts-md5';
-import { AuthenticationException, NotFoundException, ValidationException } from 'src/user/utils/exceptions';
+import { AuthenticationException, NotFoundException, ValidationException } from 'src/user/utils/exception';
 
 const SECRET_KEY = 'THIS_KEY_IS_VERY_VERY_SECRET';
 const TWVENTY_MINUTES_EXPIRATION_IN_SECONDS = 1200;

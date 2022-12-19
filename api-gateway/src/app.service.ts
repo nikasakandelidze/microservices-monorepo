@@ -4,15 +4,25 @@ import { AxiosResponse } from 'axios';
 import { Request } from 'express';
 import { firstValueFrom } from 'rxjs';
 import { ServiceDiscovery } from './serviceDiscovery';
+import { RateLimiter, RateLimitOutput } from './rateLimiter';
+import { RateLimitExceededException } from './utils/exception';
 
 @Injectable()
 export class AppService {
   constructor(
     private readonly httpService: HttpService,
     private readonly serviceDiscovery: ServiceDiscovery,
+    private readonly rateLimiter: RateLimiter,
   ) {}
 
   async handleApiGatewayRequest(req: Request) {
+    const rateLimitOutput: RateLimitOutput =
+      await this.rateLimiter.throttleRequest({
+        id: req.ip,
+      });
+    if (rateLimitOutput.throttled) {
+      throw new RateLimitExceededException(rateLimitOutput.metadata);
+    }
     if (
       req.originalUrl === '/api/auth/register' ||
       req.originalUrl === '/api/auth/login'

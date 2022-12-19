@@ -19,3 +19,9 @@ services:
       - consul-server
     depends_on:
       - consul-server
+  cache:
+    image: redis
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server

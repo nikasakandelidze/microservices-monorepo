@@ -28,6 +28,8 @@
     "@nestjs/platform-express": "^9.0.0",
     "@types/consul": "^0.40.0",
     "consul": "^1.2.0",
+    "moment": "^2.29.4",
+    "redis": "^4.5.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0"
