@@ -1,85 +1,63 @@
 import { Injectable } from '@nestjs/common';
-import { User } from './entity';
-import { AddUser, PatchUser, PutUser } from './dto';
-import { v4 as uuidv4 } from 'uuid';
-import { validateAddUser, validatePutUser } from './utils/validator';
-import { NotFoundException, ValidationException } from './utils/exception';
+import { NotFoundException, ValidationException } from './exception';
 import { Logger } from '@nestjs/common';
 import { Md5 } from 'ts-md5';
+import { validateAddUser } from './validator';
+import { User, UserDocument } from './schema/user.schema';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { AddUser, PatchUser } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
-  private readonly users: Record<string, User> = {};
+  constructor(@InjectModel('User') private readonly userModel: Model<UserDocument>) {}
 
-  public addNewUser(addUser: AddUser): User {
-    const { valid, message } = validateAddUser(addUser, this.users);
-    if (valid) {
-      const newId: string = uuidv4();
-      const now = new Date().toISOString();
-      const hashedPassword = new Md5().appendAsciiStr(addUser.password).end(false) as string;
-      this.users[newId] = {
-        id: newId,
-        name: addUser.name,
-        email: addUser.email,
-        passwordHash: hashedPassword,
-        createdTimestamp: now,
-        updatedTimestamp: now,
-      };
-      return this.users[newId];
-    } else {
+  public async addNewUser(addUser: AddUser): Promise<User> {
+    const validationResult = validateAddUser(addUser);
+    if (!validationResult.valid) {
+      throw new ValidationException(validationResult.message);
+    }
+    const userWithSameEmail = await this.userModel.findOne({ email: addUser.email }).exec();
+    if (userWithSameEmail) {
+      const message = `User with email: ${addUser.email} already exists`;
       Logger.log(`Validation for add user with email: ${addUser.email} failed. Message: ${message}`);
       throw new ValidationException(message);
     }
+    const now = new Date().toISOString();
+    const hashedPassword = new Md5().appendAsciiStr(addUser.password).end(false) as string;
+    const newUser = {
+      name: addUser.name,
+      email: addUser.email,
+      passwordHash: hashedPassword,
+      createdTimestamp: now,
+      updatedTimestamp: now,
+    } as User;
+    const user = new this.userModel(newUser);
+    return await user.save();
   }
 
-  public findUserWithEmail(email: string): User | undefined {
-    return Object.keys(this.users)
-      .map((id) => this.users[id])
-      .find((user) => user.email === email);
+  public async findUserWithEmail(email: string): Promise<User> {
+    const userWithSameEmail = await this.userModel.findOne({ email }).exec();
+    return userWithSameEmail;
   }
 
-  public getUserById(id: string): User {
-    const user: User | undefined = this.users[id];
-    if (user) {
-      return user;
+  public async getUserById(id: string): Promise<User> {
+    const userWithId: User = await this.userModel.findById(id).exec();
+    if (userWithId) {
+      return userWithId;
     } else {
       throw new NotFoundException(`User with id: ${id} not found`);
     }
   }
 
-  public patchUserWithId(id: string, patch: PatchUser): User {
-    const user: User | undefined = this.users[id];
-    if (user) {
-      const patchObjectWithOnlyDefinedKeys = Object.keys(patch)
-        .filter((id) => patch[id])
-        .reduce((accumulator, current) => {
-          const temp = {};
-          temp[current] = patch[current];
-          return {
-            ...accumulator,
-            ...temp,
-          };
-        }, {});
-      this.users[id] = { ...user, ...patchObjectWithOnlyDefinedKeys };
-      return this.users[id];
-    } else {
-      throw new NotFoundException(`User with id: ${id} not found`);
+  public async patchUserWithId(id: string, patch: PatchUser): Promise<User> {
+    if (!patch.email && !patch.name) {
+      throw new ValidationException('Nothign to patch');
     }
-  }
-
-  public putUserWithId(id: string, putUser: PutUser): User {
-    const user: User | undefined = this.users[id];
-    if (user) {
-      const validationResult = validatePutUser(putUser);
-      if (validationResult.valid) {
-        user.email = putUser.email;
-        user.name = putUser.name;
-        return user;
-      } else {
-        throw new ValidationException(validationResult.message);
-      }
-    } else {
-      throw new NotFoundException(`User with id: ${id} not found`);
-    }
+    const emailPatch = patch.email ? { email: patch.email } : {};
+    const namePatch = patch.name ? { name: patch.name } : {};
+    const mutation = { ...emailPatch, ...namePatch };
+    await this.userModel.updateOne({ _id: id }, { $set: { ...mutation } }).exec();
+    return await this.userModel.findById(id).exec();
   }
 }

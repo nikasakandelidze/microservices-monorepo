@@ -7,7 +7,6 @@ export class AddUser {
 export class PatchUser {
   name: string | undefined;
   email: string | undefined;
-  password: string | undefined;
 }
 
 export class PutUser {

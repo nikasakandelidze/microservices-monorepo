@@ -1,21 +1,16 @@
-import { User } from '../entity';
-import { AddUser, PutUser } from '../dto';
+import { AddUser, PutUser } from './dto/user.dto';
 
 export type ValidationResult = {
   message: string;
   valid: boolean;
 };
 
-export const validateAddUser = (addUser: AddUser, users: Record<string, User>): ValidationResult => {
+export const validateAddUser = (addUser: AddUser): ValidationResult => {
   const validationResult: ValidationResult = {
     message: undefined,
     valid: true,
   };
-  const sameEmailUser: string | undefined = Object.keys(users).find((id) => users[id].email === addUser.email);
-  if (sameEmailUser) {
-    validationResult.message = `User with email: ${addUser.email} is already present`;
-    validationResult.valid = false;
-  } else if (!addUser.name) {
+  if (!addUser.name) {
     validationResult.message = `User name must not be empty`;
     validationResult.valid = false;
   } else if (!addUser.email) {
