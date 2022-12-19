@@ -1,27 +1,36 @@
 version: "3"
 services:
-  consul-server:
+  service-discovery-server:
     image: consul
     command: "agent -server -bootstrap"
-  consul-agent1:
+  service-discovery-agent1:
     image: consul
     ports:
       - "8500:8500"
-    command: "agent -join consul-server -client 0.0.0.0 -ui"
-    links:
-      - consul-server
+    command: "agent -join service-discovery-server -client 0.0.0.0 -ui"
     depends_on:
-      - consul-server
-  consul-agent2:
+      - service-discovery-server
+  service-discovery-agent2:
     image: consul
-    command: "agent -join consul-server -client 0.0.0.0"
-    links:
-      - consul-server
+    command: "agent -join service-discovery-server -client 0.0.0.0"
     depends_on:
-      - consul-server
-  cache:
+      - service-discovery-server
+  api-gateway-rate-limiter-cache:
     image: redis
     restart: always
     ports:
       - '6379:6379'
     command: redis-server
+  authentication-service-db:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: auth
+      MONGO_INITDB_ROOT_PASSWORD: authpassword
+      MONGO_INITDB_DATABASE: authdb
+    ports:
+      - 27017:27017
+    volumes:
+      - authentication_db_data_vol:/data/db
+
+volumes:
+  authentication_db_data_vol:
