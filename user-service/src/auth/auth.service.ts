@@ -8,7 +8,7 @@ import { Md5 } from 'ts-md5';
 import { AuthenticationException, NotFoundException, ValidationException } from 'src/user/utils/exceptions';
 
 const SECRET_KEY = 'THIS_KEY_IS_VERY_VERY_SECRET';
-const TWVENTY_MINUTES_EXPIRATION_IN_SECONDS = 10;
+const TWVENTY_MINUTES_EXPIRATION_IN_SECONDS = 1200;
 const ISSUER = 'NEST_AUTHENTICATION_SERVICE';
 
 @Injectable()
