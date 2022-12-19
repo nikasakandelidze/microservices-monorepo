@@ -60,7 +60,6 @@ export class AppService {
         'AUTHENTICATION_SERVICE',
       );
       const fullPath = `${nextUrl}/auth/verify`;
-      const body = req.body;
       const result: AxiosResponse<any> = await firstValueFrom(
         this.httpService.post(fullPath, { token }),
       );
