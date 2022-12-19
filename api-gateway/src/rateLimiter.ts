@@ -48,8 +48,8 @@ export class RateLimiter {
       .expire(userId, TIME_PERIOD_SECONDS)
       .exec();
     if (transactionResult) {
-      const numOfLogs: number = transactionResult[2] as number;
-      const throttled = numOfLogs > REQUESTS_LIMIT;
+      const numOfLogs = transactionResult[2] as Array<number>;
+      const throttled = numOfLogs.length > REQUESTS_LIMIT;
       return {
         throttled,
         metadata:
