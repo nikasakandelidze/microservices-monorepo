@@ -28,8 +28,7 @@ export class AppService {
       req.originalUrl === '/api/auth/login'
     ) {
       return this.handleAuthenticationEndpoints(req);
-    }
-    if (req.originalUrl.startsWith('/api/v1/')) {
+    } else if (req.originalUrl.startsWith('/api/')) {
       return this.handleRestricedResourceAccess(req);
     }
   }
@@ -75,11 +74,34 @@ export class AppService {
       );
       const data = result.data;
       if (data.verified) {
-        return { verified: true };
+        return await this.forwardRequest(req);
+      } else {
+        throw new UnauthorizedException();
       }
     } catch (e) {
       Logger.warn(e);
       throw new UnauthorizedException();
+    }
+  }
+
+  async forwardRequest(req: Request) {
+    const url = req.originalUrl;
+    const nextUrl = await this.serviceDiscovery.getNextUrlForService(
+      'TICKET_SERVICE',
+    );
+    const fullPath = `${nextUrl}${url}`;
+    const method = req.method.toLowerCase();
+    const body = req.body;
+    if (method === 'post') {
+      const result: AxiosResponse<any> = await firstValueFrom(
+        this.httpService.post(fullPath, body),
+      );
+      return result.data;
+    } else if (method === 'get') {
+      const result: AxiosResponse<any> = await firstValueFrom(
+        this.httpService.get(fullPath),
+      );
+      return result.data;
     }
   }
 }
