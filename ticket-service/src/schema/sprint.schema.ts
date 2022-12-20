@@ -15,6 +15,7 @@ export class Sprint {
   title: string;
   @Prop({ required: true })
   description: string;
+  @Prop()
   authorId: Types.ObjectId;
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' }] })
   tickets: Ticket[];

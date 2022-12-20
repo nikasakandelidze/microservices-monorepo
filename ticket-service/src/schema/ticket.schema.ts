@@ -14,6 +14,7 @@ export class Ticket {
   createdAt?: Date;
   @Prop()
   updatedAt?: Date;
+  @Prop()
   authorId: Types.ObjectId;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Sprint' })
   sprint: Sprint;

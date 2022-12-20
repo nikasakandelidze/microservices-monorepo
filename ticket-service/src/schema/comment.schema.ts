@@ -13,6 +13,7 @@ export class Comment {
   createdAt?: Date;
   @Prop()
   updatedAt?: Date;
+  @Prop()
   auhtorId: Types.ObjectId;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' })
   ticket: Ticket;
