@@ -3,3 +3,8 @@ export class AddTicketDto {
   authorId: string;
   sprintId: string;
 }
+
+export class AssignTicketDto {
+  ticketId: string;
+  userId: string;
+}

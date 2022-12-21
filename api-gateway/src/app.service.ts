@@ -1,12 +1,20 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  Logger,
+  HttpStatus,
+  BadGatewayException,
+} from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { Request } from 'express';
 import { firstValueFrom } from 'rxjs';
-import { ServiceDiscovery } from './serviceDiscovery';
-import { RateLimiter, RateLimitOutput } from './rateLimiter';
+import { ServiceDiscovery } from './serviceDiscovery.provider';
+import { RateLimiter, RateLimitOutput } from './rateLimiter.provider';
 import { RateLimitExceededException } from './utils/exception';
+import { TokenVerificationResult } from './dto/auth.dto';
 
+const USER_RESOURCE_TOKEN = '/api/user';
 @Injectable()
 export class AppService {
   constructor(
@@ -48,7 +56,6 @@ export class AppService {
       );
       return result.data;
     } catch (e) {
-      Logger.error(e);
       throw new UnauthorizedException();
     }
   }
@@ -64,44 +71,69 @@ export class AppService {
     if (bearer !== 'Bearer' || !token) {
       throw new UnauthorizedException();
     }
+    let result: AxiosResponse<any> = undefined;
     try {
       const nextUrl = await this.serviceDiscovery.getNextUrlForService(
         'AUTHENTICATION_SERVICE',
       );
       const fullPath = `${nextUrl}/auth/verify`;
-      const result: AxiosResponse<any> = await firstValueFrom(
-        this.httpService.post(fullPath, { token }),
-      );
-      const data = result.data;
-      if (data.verified) {
-        return await this.forwardRequest(req);
-      } else {
-        throw new UnauthorizedException();
-      }
+      result = await firstValueFrom(this.httpService.post(fullPath, { token }));
     } catch (e) {
-      Logger.warn(e);
-      throw new UnauthorizedException();
+      const response = e.response as AxiosResponse;
+      Logger.log(response.status, response.data.message);
+      if (response.status === HttpStatus.UNAUTHORIZED) {
+        throw new UnauthorizedException({
+          message:
+            'Specified JWT authentication token is not valid or has expired',
+        });
+      } else {
+        throw new BadGatewayException({
+          message: "Coudln't fulfill your request. Please try again later.",
+        });
+      }
+    }
+    if (result) {
+      const data: TokenVerificationResult = result.data;
+      if (data.verified) {
+        return await this.forwardRequest(req, data);
+      } else {
+        throw new UnauthorizedException({
+          message:
+            'Specified JWT authentication token is not valid or has expired',
+        });
+      }
     }
   }
 
-  async forwardRequest(req: Request) {
+  async forwardRequest(req: Request, data: TokenVerificationResult) {
     const url = req.originalUrl;
+    const serviceName = url.startsWith(USER_RESOURCE_TOKEN)
+      ? 'AUTHENTICATION_SERVICE'
+      : 'TICKET_SERVICE';
     const nextUrl = await this.serviceDiscovery.getNextUrlForService(
-      'TICKET_SERVICE',
+      serviceName,
     );
     const fullPath = `${nextUrl}${url}`;
     const method = req.method.toLowerCase();
     const body = req.body;
-    if (method === 'post') {
-      const result: AxiosResponse<any> = await firstValueFrom(
-        this.httpService.post(fullPath, body),
-      );
-      return result.data;
-    } else if (method === 'get') {
-      const result: AxiosResponse<any> = await firstValueFrom(
-        this.httpService.get(fullPath),
-      );
-      return result.data;
+    try {
+      if (method === 'post') {
+        const result: AxiosResponse<any> = await firstValueFrom(
+          this.httpService.post(fullPath, { ...body, authorId: data.id }),
+        );
+        return result.data;
+      } else if (method === 'get') {
+        const result: AxiosResponse<any> = await firstValueFrom(
+          this.httpService.get(fullPath),
+        );
+        return result.data;
+      }
+    } catch (e) {
+      const response = e.response as AxiosResponse;
+      Logger.warn(response.status, response.data.message);
+      throw new BadGatewayException({
+        message: "Couldn't fulfill request. Please try again later",
+      });
     }
   }
 }

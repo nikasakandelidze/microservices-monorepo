@@ -16,6 +16,8 @@ export class Ticket {
   updatedAt?: Date;
   @Prop()
   authorId: Types.ObjectId;
+  @Prop()
+  assigneeId: string;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Sprint' })
   sprint: Sprint;
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }] })

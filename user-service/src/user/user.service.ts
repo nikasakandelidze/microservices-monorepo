@@ -37,13 +37,17 @@ export class UserService {
     return await user.save();
   }
 
+  public async getAllUsers() {
+    return this.userModel.find({}, '_id name email createdTimeStamp updatedTimeStamp');
+  }
+
   public async findUserWithEmail(email: string): Promise<User> {
     const userWithSameEmail = await this.userModel.findOne({ email }).exec();
     return userWithSameEmail;
   }
 
   public async getUserById(id: string): Promise<User> {
-    const userWithId: User = await this.userModel.findById(id).exec();
+    const userWithId: User = await this.userModel.findById(id, '_id name email createdTimeStamp updatedTimeStamp').exec();
     if (userWithId) {
       return userWithId;
     } else {

@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { AddSprintDto } from './dto/sprint.dto';
-import { AddTicketDto } from './dto/ticket.dto';
+import { AddTicketDto, AssignTicketDto } from './dto/ticket.dto';
 import { SprintService } from './provider/sprint.provider';
 import { TicketService } from './provider/ticket.provider';
 import { AddCommentDto } from './dto/comment.dto';
@@ -46,5 +46,18 @@ export class AppController {
   @Get('comment/:id')
   async getCommentById(@Param('id') commentId: string) {
     return await this.commentService.getCommentById(commentId);
+  }
+
+  @Get('ticket/user/:userId')
+  async getTicketsForSpecificUser(
+    @Param('userId') userId: string,
+    @Query('includeComments') includeComments?: boolean,
+  ) {
+    return await this.ticketService.getTicketByUserId(userId, includeComments);
+  }
+
+  @Post('ticket/assign')
+  async assignTicketToUser(@Body() ticketAssignment: AssignTicketDto) {
+    return await this.ticketService.assignTicketToUser(ticketAssignment);
   }
 }
