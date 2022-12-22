@@ -7,7 +7,7 @@ import { SprintSchema } from './schema/sprint.schema';
 import { TicketService } from './provider/ticket.provider';
 import { SprintService } from './provider/sprint.provider';
 import { CommentService } from './provider/comment.provider';
-import { ServiceDiscovery } from './serviceDiscovery/servicediscovery.provider';
+import { ServiceDiscovery } from './serviceDiscovery/service.discovery.provider';
 import { HttpModule } from '@nestjs/axios';
 
 const MONGO_DB_URL = 'mongodb://ticket:ticketpassword@localhost:27027';

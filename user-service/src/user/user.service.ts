@@ -13,7 +13,6 @@ export class UserService {
   constructor(@InjectModel('User') private readonly userModel: Model<UserDocument>) {}
 
   public async addNewUser(addUser: AddUser): Promise<User> {
-    Logger.log(addUser);
     const validationResult = validateAddUser(addUser);
     if (!validationResult.valid) {
       throw new ValidationException(validationResult.message);

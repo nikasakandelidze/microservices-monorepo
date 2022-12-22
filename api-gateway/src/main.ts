@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { RateLimiter } from './rateLimiter.provider';
+import { RateLimiter } from './provider/rate.imiter.provider';
 
 const PORT = 3000;
 

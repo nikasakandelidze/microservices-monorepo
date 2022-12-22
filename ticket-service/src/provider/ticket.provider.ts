@@ -13,7 +13,7 @@ import { AddTicketDto, AssignTicketDto } from 'src/dto/ticket.dto';
 import { Comment } from 'src/schema/comment.schema';
 import { SprintDocument } from 'src/schema/sprint.schema';
 import { TicketDocument } from 'src/schema/ticket.schema';
-import { ServiceDiscovery } from 'src/serviceDiscovery/servicediscovery.provider';
+import { ServiceDiscovery } from 'src/serviceDiscovery/service.discovery.provider';
 import { SprintService } from './sprint.provider';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
