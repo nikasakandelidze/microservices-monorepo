@@ -4,5 +4,5 @@ export class UserDto {
   email: string;
   createdTimestamp: string;
   updatedTimestamp: string;
-  passwordHash: string;
+  passwordHash?: string;
 }

@@ -14,6 +14,6 @@ export class NotFoundException extends HttpException {
 
 export class AuthenticationException extends HttpException {
   constructor(message: string) {
-    super(message, HttpStatus.UNAUTHORIZED);
+    super({ message }, HttpStatus.UNAUTHORIZED);
   }
 }

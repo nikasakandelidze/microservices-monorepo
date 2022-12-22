@@ -24,7 +24,9 @@ export class CommentService {
       .findById(comment.ticketId)
       .exec();
     if (!ticket) {
-      throw new BadRequestException();
+      throw new BadRequestException({
+        message: `Ticket with specified id: ${comment.ticketId} is not present`,
+      });
     }
     comment['ticket'] = ticket;
     const newComment = new this.commentModel(comment);

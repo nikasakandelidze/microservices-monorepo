@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ServiceDiscovery } from './serviceDiscovery/service.discovery.provider';
+import { ServiceDiscovery } from './provider/service.discovery.provider';
 
 const PORT = 4004;
 const SERVICE_NAME = process.env.NAME || 'TICKET_SERVICE';

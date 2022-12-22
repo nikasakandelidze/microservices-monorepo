@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { NotFoundException, ValidationException } from './exception';
 import { Logger } from '@nestjs/common';
 import { Md5 } from 'ts-md5';
 import { validateAddUser } from './validator';
 import { User, UserDocument } from './schema/user.schema';
-import { Model } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { AddUser, PatchUser } from './dto/user.dto';
 
@@ -63,5 +63,13 @@ export class UserService {
     const mutation = { ...emailPatch, ...namePatch };
     await this.userModel.updateOne({ _id: id }, { $set: { ...mutation } }).exec();
     return await this.userModel.findById(id).exec();
+  }
+
+  public async getUsersByIds(userIds: Array<string>) {
+    Logger.log(userIds, '------');
+    if (!userIds || userIds.length === 0) {
+      throw new BadRequestException({ message: 'userIds must be specified' });
+    }
+    return await this.userModel.find({ _id: { $in: userIds.map((userId: string) => new mongoose.Types.ObjectId(userId)) } }, '_id name email createdTimeStamp updatedTimeStamp').exec();
   }
 }

@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument, Types } from 'mongoose';
+import { Project } from './project.schema';
 import { Ticket } from './ticket.schema';
 
 // Note
@@ -19,6 +20,8 @@ export class Sprint {
   authorId: Types.ObjectId;
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' }] })
   tickets: Ticket[];
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Project' })
+  project: Project;
   @Prop()
   createdAt?: Date;
   @Prop()

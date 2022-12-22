@@ -16,7 +16,7 @@ export class Ticket {
   @Prop()
   updatedAt?: Date;
   @Prop()
-  authorId: Types.ObjectId;
+  authorId: Types.ObjectId; //maybe storing whole user instead of just id would be better here?
   @Prop()
   assigneeId: string;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Sprint' })

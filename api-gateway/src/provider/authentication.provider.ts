@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { firstValueFrom } from 'rxjs';
 import { ServiceDiscovery } from './service.discovery.provider';
@@ -35,7 +35,9 @@ export class AuthenticationSerivce {
       );
       return result.data;
     } catch (e) {
-      throw new UnauthorizedException();
+      const response = e.response as AxiosResponse;
+      Logger.warn(response.data.message);
+      throw new UnauthorizedException({ message: response.data.message });
     }
   }
 }

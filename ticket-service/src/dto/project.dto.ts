@@ -1,6 +1,6 @@
-export class AddSprintDto {
-  projectId: string;
+export class AddProjectDto {
   title: string;
   description: string;
   authorId: string;
+  memberIds: Array<string>;
 }

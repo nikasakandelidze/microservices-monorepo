@@ -1,5 +1,6 @@
 import {
   BadGatewayException,
+  BadRequestException,
   HttpStatus,
   Injectable,
   Logger,
@@ -23,6 +24,7 @@ export class ApiProxyService {
     '/api/user',
     '/api/sprint',
     '/api/comment',
+    '/api/project',
   ];
 
   constructor(
@@ -61,9 +63,11 @@ export class ApiProxyService {
           message:
             'Specified JWT authentication token is not valid or has expired',
         });
+      } else if (response.status === HttpStatus.BAD_REQUEST) {
+        throw new BadRequestException({ message: response.data.message });
       } else {
         throw new BadGatewayException({
-          message: "Coudln't fulfill your request. Please try again later.",
+          message: "Coudln't fullfil your request. Please try again later.",
         });
       }
     }
@@ -111,7 +115,7 @@ export class ApiProxyService {
         const result: AxiosResponse<any> = await firstValueFrom(
           this.httpService.post(fullPath, {
             ...body,
-            authorId: tokenVerificationResult.id,
+            authorId: tokenVerificationResult.id, //this is default extension behaviour for all post request with bodies
           }),
         );
         return result.data;

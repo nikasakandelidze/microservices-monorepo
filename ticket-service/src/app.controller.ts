@@ -9,6 +9,8 @@ import { SprintService } from './provider/sprint.provider';
 import { TicketService } from './provider/ticket.provider';
 import { AddCommentDto } from './dto/comment.dto';
 import { CommentService } from './provider/comment.provider';
+import { AddProjectDto } from './dto/project.dto';
+import { ProjectService } from './provider/project.provider';
 
 @Controller('api')
 export class AppController {
@@ -16,6 +18,7 @@ export class AppController {
     private readonly sprintService: SprintService,
     private readonly ticketService: TicketService,
     private readonly commentService: CommentService,
+    private readonly projectService: ProjectService,
   ) {}
 
   @Post('sprint')
@@ -70,5 +73,15 @@ export class AppController {
     @Body() ticketStatusUpdate: TicketStatusUpdateDto,
   ) {
     return await this.ticketService.updateStatusOfTicket(ticketStatusUpdate);
+  }
+
+  @Post('project')
+  async addNewProject(@Body() addProject: AddProjectDto) {
+    return await this.projectService.addNewProject(addProject);
+  }
+
+  @Get('project')
+  async getAllProjects() {
+    return await this.projectService.getAllProjects();
   }
 }

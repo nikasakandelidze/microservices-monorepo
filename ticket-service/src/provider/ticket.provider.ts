@@ -17,7 +17,7 @@ import {
 import { Comment } from 'src/schema/comment.schema';
 import { SprintDocument } from 'src/schema/sprint.schema';
 import { TicketDocument } from 'src/schema/ticket.schema';
-import { ServiceDiscovery } from 'src/serviceDiscovery/service.discovery.provider';
+import { ServiceDiscovery } from 'src/provider/service.discovery.provider';
 import { SprintService } from './sprint.provider';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
@@ -54,7 +54,9 @@ export class TicketService {
   async addCommentToTicket(comment: Comment, ticketId: string) {
     const ticket = await this.ticketModel.findById(ticketId).exec();
     if (!ticket) {
-      throw new BadRequestException();
+      throw new BadRequestException({
+        message: "Couldn't find ticket with specified id",
+      });
     }
     ticket.comments.push(comment);
     return await ticket.save();

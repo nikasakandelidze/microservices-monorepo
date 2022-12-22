@@ -3,7 +3,7 @@ import { UserService } from 'src/user/user.service';
 import { AuthResponse, LoginUser, TokenVerificationResult, VerifyToken } from './dto/auth.dto';
 import { sign, verify, JwtPayload } from 'jsonwebtoken';
 import { Md5 } from 'ts-md5';
-import { AuthenticationException, NotFoundException, ValidationException } from 'src/user/exception';
+import { AuthenticationException, NotFoundException } from 'src/user/exception';
 import { User } from 'src/user/schema/user.schema';
 import { AddUser } from 'src/user/dto/user.dto';
 
@@ -29,7 +29,7 @@ export class AuthService {
         const token = this.generateJwtTokenForUser(user);
         return { token };
       } else {
-        throw new ValidationException(`Email or password is not correct`);
+        throw new AuthenticationException(`Email or password is not correct`);
       }
     } else {
       throw new NotFoundException(`User with email: ${loginUser.email} not found`);
