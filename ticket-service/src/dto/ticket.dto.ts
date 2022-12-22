@@ -1,3 +1,5 @@
+import { TicketStatus } from 'src/common/common.types';
+
 export class AddTicketDto {
   content: string;
   authorId: string;
@@ -7,4 +9,9 @@ export class AddTicketDto {
 export class AssignTicketDto {
   ticketId: string;
   userId: string;
+}
+
+export class TicketStatusUpdateDto {
+  ticketId: string;
+  status: TicketStatus;
 }

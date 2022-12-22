@@ -9,7 +9,11 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { firstValueFrom } from 'rxjs';
-import { AddTicketDto, AssignTicketDto } from 'src/dto/ticket.dto';
+import {
+  AddTicketDto,
+  AssignTicketDto,
+  TicketStatusUpdateDto,
+} from 'src/dto/ticket.dto';
 import { Comment } from 'src/schema/comment.schema';
 import { SprintDocument } from 'src/schema/sprint.schema';
 import { TicketDocument } from 'src/schema/ticket.schema';
@@ -18,6 +22,7 @@ import { SprintService } from './sprint.provider';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { UserDto } from 'src/dto/user.dto';
+import { TICKET_STATUSES } from 'src/common/common.types';
 
 @Injectable()
 export class TicketService {
@@ -124,5 +129,19 @@ export class TicketService {
         });
       }
     }
+  }
+
+  async updateStatusOfTicket(ticketStatusUpdate: TicketStatusUpdateDto) {
+    if (!TICKET_STATUSES.includes(ticketStatusUpdate.status)) {
+      throw new BadRequestException();
+    }
+    const ticket: TicketDocument = await this.ticketModel
+      .findById(ticketStatusUpdate.ticketId)
+      .exec();
+    if (!ticket) {
+      throw new BadRequestException();
+    }
+    ticket.status = ticketStatusUpdate.status;
+    return await ticket.save();
   }
 }

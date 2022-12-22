@@ -1,6 +1,10 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { AddSprintDto } from './dto/sprint.dto';
-import { AddTicketDto, AssignTicketDto } from './dto/ticket.dto';
+import {
+  AddTicketDto,
+  AssignTicketDto,
+  TicketStatusUpdateDto,
+} from './dto/ticket.dto';
 import { SprintService } from './provider/sprint.provider';
 import { TicketService } from './provider/ticket.provider';
 import { AddCommentDto } from './dto/comment.dto';
@@ -59,5 +63,12 @@ export class AppController {
   @Post('ticket/assign')
   async assignTicketToUser(@Body() ticketAssignment: AssignTicketDto) {
     return await this.ticketService.assignTicketToUser(ticketAssignment);
+  }
+
+  @Post('ticket/status')
+  async assignNewStatusToTicket(
+    @Body() ticketStatusUpdate: TicketStatusUpdateDto,
+  ) {
+    return await this.ticketService.updateStatusOfTicket(ticketStatusUpdate);
   }
 }
