@@ -41,6 +41,12 @@ services:
       - 27027:27017
     volumes:
       - ticket_db_data_vol:/data/db
+  bullmq-redis:
+    image: redis
+    restart: always
+    ports:
+      - '6380:6379'
+    command: redis-server
 
 volumes:
   authentication_db_data_vol:

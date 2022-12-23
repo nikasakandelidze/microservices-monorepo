@@ -16,12 +16,15 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { InjectModel } from '@nestjs/mongoose';
 import { Sprint } from 'src/schema/sprint.schema';
+import { OutboxMessageDocument } from 'src/schema/outbox.message.schema';
 
 @Injectable()
 export class ProjectService {
   constructor(
     @InjectModel('Project')
     private readonly projectModel: Model<ProjectDocument>,
+    @InjectModel('OutboxMessage')
+    private readonly outboxMessageModel: Model<OutboxMessageDocument>,
     private readonly serviceDiscovery: ServiceDiscovery,
     private readonly httpService: HttpService,
   ) {}
@@ -63,14 +66,23 @@ export class ProjectService {
     }
     if (users.length > 0) {
       const { passwordHash, ...rest } = users.shift();
-      console.log(rest, '===rest');
       const newProject = new this.projectModel({
         title: addProject.title,
         description: addProject.description,
         author: rest,
         members: users.map(({ passwordHash, ...others }) => others),
       });
-      return await newProject.save();
+      const result = await newProject.save();
+      const outboxMessage = new this.outboxMessageModel({
+        header: {
+          title: 'PROJECT_ADDED',
+          description: 'New project was added',
+        },
+        payload: { project: result },
+        type: 'PROJECT_ADDED',
+      });
+      await outboxMessage.save();
+      return result;
     }
   }
 

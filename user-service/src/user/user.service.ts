@@ -4,7 +4,7 @@ import { Logger } from '@nestjs/common';
 import { Md5 } from 'ts-md5';
 import { validateAddUser } from './validator';
 import { User, UserDocument } from './schema/user.schema';
-import mongoose, { Model, Types } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { AddUser, PatchUser } from './dto/user.dto';
 
@@ -66,7 +66,6 @@ export class UserService {
   }
 
   public async getUsersByIds(userIds: Array<string>) {
-    Logger.log(userIds, '------');
     if (!userIds || userIds.length === 0) {
       throw new BadRequestException({ message: 'userIds must be specified' });
     }
