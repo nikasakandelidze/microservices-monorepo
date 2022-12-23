@@ -36,6 +36,14 @@ export class ProjectService {
     if (!addProject.memberIds) {
       addProject.memberIds = [];
     }
+    const project = await this.projectModel
+      .findOne({ title: addProject.title })
+      .exec();
+    if (project) {
+      throw new BadRequestException({
+        message: `Project with specified title: ${addProject.title} already exists`,
+      });
+    }
     let users = [];
     try {
       const acumulateduserIds = [addProject.authorId, ...addProject.memberIds];

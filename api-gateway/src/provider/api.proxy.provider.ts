@@ -128,6 +128,9 @@ export class ApiProxyService {
     } catch (e) {
       const response = e.response as AxiosResponse;
       Logger.warn(response.status, response.data.message);
+      if (response.status === HttpStatus.BAD_REQUEST) {
+        throw new BadRequestException({ message: response.data.message });
+      }
       throw new BadGatewayException({
         message: "Couldn't fulfill request. Please try again later",
       });
