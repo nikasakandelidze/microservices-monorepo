@@ -15,6 +15,7 @@ import { ServiceDiscovery } from './service.discovery.provider';
 import { IncomingHttpHeaders } from 'http';
 
 const USER_RESOURCE_TOKEN = '/api/user';
+const NOTIFICATION_RESOURCE_TOKEN = '/api/notification';
 
 @Injectable()
 export class ApiProxyService {
@@ -25,6 +26,7 @@ export class ApiProxyService {
     '/api/sprint',
     '/api/comment',
     '/api/project',
+    '/api/notification',
   ];
 
   constructor(
@@ -105,6 +107,8 @@ export class ApiProxyService {
   ) {
     const serviceName = url.startsWith(USER_RESOURCE_TOKEN)
       ? 'AUTHENTICATION_SERVICE'
+      : url.startsWith(NOTIFICATION_RESOURCE_TOKEN)
+      ? 'NOTIFICATION_SERVICE'
       : 'TICKET_SERVICE';
     const nextUrl = await this.serviceDiscovery.getNextUrlForService(
       serviceName,
@@ -121,7 +125,16 @@ export class ApiProxyService {
         return result.data;
       } else if (method === 'get') {
         const result: AxiosResponse<any> = await firstValueFrom(
-          this.httpService.get(fullPath),
+          this.httpService.get(fullPath, {
+            params: { userId: tokenVerificationResult.id },
+          }),
+        );
+        return result.data;
+      } else if (method === 'patch') {
+        const result: AxiosResponse<any> = await firstValueFrom(
+          this.httpService.patch(fullPath, {
+            params: { userId: tokenVerificationResult.id },
+          }),
         );
         return result.data;
       }
